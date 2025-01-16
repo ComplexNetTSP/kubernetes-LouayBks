@@ -1,10 +1,23 @@
-from flask import Flask
+from flask import Flask , render_template, request, url_for, redirect
+from pymongo import MongoClient
 from datetime import datetime
 import socket
 
 app = Flask(__name__)
 
-@app.route("/")
+client = MongoClient('localhost', 27017)
+db = client.flask_db
+post = db.posts
+
+
+@app.route('/', methods=('GET', 'POST'))
+def index():
+    current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    server_hostname = socket.gethostname()
+    
+    return render_template('index.html', current_date=current_date, server_hostname=server_hostname)
+
+"""
 def home():
     # Fetching the current date
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -14,6 +27,7 @@ def home():
     
     # HTML content for the page
     html_content = f"""
+"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -29,9 +43,10 @@ def home():
         <p><strong>Current Date:</strong> {current_date}</p>
     </body>
     </html>
-    """
+"""
+"""
     
     return html_content
-
+"""
 if __name__ == "__main__":
     app.run(debug=True)
