@@ -1,2 +1,2 @@
 Flask
-Flash pymongo
+pymongo

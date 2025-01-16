@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: ../  # The build context remains the root directory
+      dockerfile: docker/Dockerfile  # Specify the correct Dockerfile path
+    container_name: flask_app_v2
+    ports:
+      - "5000:5000"  # Map Flask app's port to host
+    environment:
+      - MONGO_URI=mongodb://mongodb_container:27017  # MongoDB connection string
+    depends_on:
+      - mongodb  # Ensure MongoDB starts before the Flask app
+    networks:
+      - app_network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    restart: always
+    ports:
+      - "27017:27017"  # Expose MongoDB's default port
+    volumes:
+      - mongodb_data:/data/db  # Persistent storage for MongoDB
+    networks:
+      - app_network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app_network:

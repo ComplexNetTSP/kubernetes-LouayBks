@@ -1,12 +1,12 @@
-from flask import Flask , render_template, request, url_for, redirect
+from flask import Flask , render_template, request, url_for, redirect, jsonify
 from pymongo import MongoClient
 from datetime import datetime
 import socket
 
 app = Flask(__name__)
 
-client = MongoClient('localhost', 27017)
-db = client.flask_db
+client = MongoClient("mongodb://mongodb_container:27017")
+db = client["posts"]
 post = db.posts
 
 
@@ -17,36 +17,16 @@ def index():
     
     return render_template('index.html', current_date=current_date, server_hostname=server_hostname)
 
-"""
-def home():
-    # Fetching the current date
-    current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+@app.route('/posts', methods=('GET',))
+def getPosts():
+    # Fetch last 10 records
+    records = list(db.test_collection.find().sort("_id", -1).limit(10))
     
-    # Fetching the server hostname
-    server_hostname = socket.gethostname()
     
-    # HTML content for the page
-    html_content = f"""
-"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>One Page Flask App</title>
-    </head>
-    <body>
-        <h3>Sorry for having forked this I'm just looking to learn on a project :)</h3>
-        <h1>Welcome to My Flask Application</h1>
-        <p><strong>Your Name:</strong> Louay Belkhamsa</p>
-        <p><strong>Project Name:</strong> Lou's Studies Blog</p>
-        <p><strong>Website Version:</strong> V1</p>
-        <p><strong>Server Hostname:</strong> {server_hostname}</p>
-        <p><strong>Current Date:</strong> {current_date}</p>
-    </body>
-    </html>
-"""
-"""
+    for record in records:
+        record['_id'] = str(record['_id'])
     
-    return html_content
-"""
+    return render_template('app_show_posts.html', posts=records)
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
